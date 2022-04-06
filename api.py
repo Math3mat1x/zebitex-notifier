@@ -1,5 +1,3 @@
-#!/usr/bin/env python2
-# coding: utf-8
 from collections import OrderedDict
 import time
 import requests
@@ -10,7 +8,7 @@ import json
 class Zebitex:
     def __init__(self, apikey,private_key, is_dev=False):
         self.apikey = apikey
-        self.priv = private_key
+        self.priv = bytes(private_key, "utf-8")
         self.url = 'https://api-staging.zebitex.com/' if is_dev else 'https://api.zebitex.com/'
 
     def _build_auth_header(self, nonce, signature, query=None):
@@ -21,6 +19,7 @@ class Zebitex:
     def _sign_request(self,method, path, nonce, query=None):
         args = json.dumps(query) if query else '{}'
         payload = "|".join([method, '/' + path, str(nonce), args ]).replace(' ', '')
+        payload = bytes(payload, "utf-8")
         return hmac.new(self.priv, payload, hashlib.sha256).hexdigest()
 
     def _private_request(self, method, path, query=None):
